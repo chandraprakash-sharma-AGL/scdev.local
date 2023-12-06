@@ -29,17 +29,13 @@ namespace scdev.local.project.Infrastructure
             Item item = parameters[0] as Item;
             if (item == null) return;
             var job = JobManager.GetJob(JobHandle);
-
-            // Connecting to Elasticsearch 
             string protocol = Settings.GetSetting("ElasticSearch.Protocol", "http");
             string host = Settings.GetSetting("ElasticSearch.Host", "localhost");
             string port = Settings.GetSetting("ElasticSearch.Port", "9200");
             var node = new Uri(string.Format("{0}://{1}:{2}", protocol, host, port));
             var settings = new Nest.ConnectionSettings(node).DisableDirectStreaming();
-            var client = new Nest.ElasticClient(settings); // Reindexing items 
-            var indexName = Settings.GetSetting("ElasticSearch.ArticlesIndex", "article-index");
-            // Re-creating index 
-
+            var client = new Nest.ElasticClient(settings);
+            var indexName = Settings.GetSetting("ElasticSearch.ArticlesIndex", "topfeature-index");
             if (client.Indices.Exists(indexName).Exists)
             {
                 DisplayStatusMessage(job, string.Format("Deleting '{0}' index", indexName));
