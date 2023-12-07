@@ -32,7 +32,7 @@ namespace scdev.local.project.Infrastructure
                 "Re-indexing the current item and its descendants in Elastic",
                 progressBoxMethod,
                 new object[] { item });
-            //Sitecore.Web.UI.Sheer.SheerResponse.Alert("Refresh tree complete");
+            Sitecore.Web.UI.Sheer.SheerResponse.Alert("Refresh tree complete");
         }
         private void Refresh(object[] parameters)
         {
@@ -96,17 +96,16 @@ namespace scdev.local.project.Infrastructure
             List<TopFeatures> topFeatures = items1.SelectMany(item => item).ToList();
             IndexTopFeaturer(topFeatures);
         }
-        public  void IndexTopFeaturer(List<TopFeatures> topFeatures)
+        public void IndexTopFeaturer(List<TopFeatures> topFeatures)
         {
-           // if (topFeatures == null || !topFeatures.Any()) return null; // Connecting to Elasticsearch 
+            if (topFeatures == null || !topFeatures.Any()) return;  
             string protocol = Settings.GetSetting("ElasticSearch.Protocol", "http");
             string host = Settings.GetSetting("ElasticSearch.Host", "localhost");
             string port = Settings.GetSetting("ElasticSearch.Port", "9200");
             var node = new Uri(string.Format("{0}://{1}:{2}", protocol, host, port));
             var settings = new Nest.ConnectionSettings(node).DisableDirectStreaming();
             var client = new Nest.ElasticClient(settings); // Reindexing items 
-            //var indexName = Settings.GetSetting("ElasticSearch.ArticlesIndex", "article-index");
-            var indexName = "topfeature-index";
+            var indexName = Settings.GetSetting("ElasticSearch.ArticlesIndex", "topfeature-index");
             var indexerResponse = client.IndexMany(topFeatures,indexName);
         }
     }
